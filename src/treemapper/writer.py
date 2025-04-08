@@ -22,6 +22,11 @@ def write_yaml_node(file, node: Dict[str, Any], indent: str = '') -> None:
 def write_tree_to_file(tree: Dict[str, Any], output_file: Path) -> None:
     """Write the complete tree to a YAML file."""
     try:
+        # ---> НАЧАЛО ИЗМЕНЕНИЯ <---
+        # Создаем родительскую директорию, если она не существует
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        # ---> КОНЕЦ ИЗМЕНЕНИЯ <---
+
         with output_file.open('w', encoding='utf-8') as f:
             f.write(f"name: {tree['name']}\n")
             f.write(f"type: {tree['type']}\n")
@@ -32,4 +37,4 @@ def write_tree_to_file(tree: Dict[str, Any], output_file: Path) -> None:
         logging.info(f"Directory tree saved to {output_file}")
     except IOError as e:
         logging.error(f"Unable to write to file '{output_file}': {e}")
-        raise
+        raise # Перевыбрасываем исключение, чтобы тест мог его поймать при необходимости
