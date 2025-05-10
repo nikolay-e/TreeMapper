@@ -58,7 +58,12 @@ def test_filenames_with_special_yaml_chars(temp_project, run_mapper):
     (temp_project / "off").touch()
 
     # Files with quotes that need escaping
-    (temp_project / 'double"quote.txt').touch()
+    try:
+        # Windows doesn't support double quotes in filenames
+        (temp_project / 'double"quote.txt').touch()
+    except OSError:
+        # Fall back to another special character on Windows
+        (temp_project / "special@char.txt").touch()
 
     # Numeric filenames
     (temp_project / "123").touch()
@@ -93,8 +98,11 @@ def test_filenames_with_special_yaml_chars(temp_project, run_mapper):
     assert "on" in all_files
     assert "off" in all_files
 
-    # Check quoted filenames
-    assert 'double"quote.txt' in all_files
+    # Check quoted/special filenames
+    if (temp_project / 'double"quote.txt').exists():
+        assert 'double"quote.txt' in all_files
+    elif (temp_project / "special@char.txt").exists():
+        assert "special@char.txt" in all_files
 
     # Check numeric filenames
     assert "123" in all_files
